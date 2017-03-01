@@ -257,6 +257,9 @@ class Decompiler(ast.NodeVisitor):
         self.write_function_def(node, is_async=True)
 
     def write_function_def(self, node, is_async=False):
+        # Different function declaration start for Python and Cython.
+        decl_start = 'def %s(' if self.mode == 'python' else 'cpdef %s('
+
         self.write_newline()
         for decorator in node.decorator_list:
             self.write_indentation()
@@ -267,7 +270,7 @@ class Decompiler(ast.NodeVisitor):
         self.write_indentation()
         if is_async:
             self.write('async ')
-        self.write('def %s(' % node.name)
+        self.write(decl_start % node.name)
         self.visit(node.args)
         self.write(')')
         if getattr(node, 'returns', None):
