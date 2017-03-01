@@ -471,13 +471,20 @@ class Decompiler(ast.NodeVisitor):
 
     def visit_AnnAssign(self, node):
         self.write_indentation()
-        if not node.simple:
-            self.write('(')
-        self.visit(node.target)
-        if not node.simple:
-            self.write(')')
-        self.write(': ')
-        self.visit(node.annotation)
+        if self.mode == 'python':
+            if not node.simple:
+                self.write('(')
+            self.visit(node.target)
+            if not node.simple:
+                self.write(')')
+            self.write(': ')
+            self.visit(node.annotation)
+        else:
+            self.write('cdef ')
+            self.visit(node.annotation)
+            self.write(' ')
+            self.visit(node.target)
+
         if node.value is not None:
             self.write(' = ')
             self.visit(node.value)
