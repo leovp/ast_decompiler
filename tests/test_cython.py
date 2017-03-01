@@ -6,6 +6,6 @@ def test_simple_function():
 def func(a: int, b: int) -> float:
     pass
 ''', '''
-cpdef func(a: int, b: int) -> float:
+cpdef func(int a, int b) -> float:
     pass
 ''', mode='cython', do_check=False)
