@@ -87,7 +87,7 @@ if hasattr(ast, 'MatMult'):
     _PRECEDENCE[ast.MatMult] = 9  # same as multiplication
 
 
-def decompile(ast, indentation=4, line_length=100, starting_indentation=0):
+def decompile(ast, indentation=4, line_length=100, starting_indentation=0, mode='python'):
     """Decompiles an AST into Python code.
 
     Arguments:
@@ -98,16 +98,27 @@ def decompile(ast, indentation=4, line_length=100, starting_indentation=0):
     - starting_indentation: indentation level at which to start producing code
 
     """
+    if mode not in ('python', 'cython'):
+        raise ValueError('Unknown mode {0!r}'.format(mode))
+
     decompiler = Decompiler(
         indentation=indentation,
         line_length=line_length,
         starting_indentation=starting_indentation,
+        mode=mode,
     )
     return decompiler.run(ast)
 
 
 class Decompiler(ast.NodeVisitor):
-    def __init__(self, indentation, line_length, starting_indentation):
+    def __init__(self, indentation, line_length, starting_indentation, mode='python'):
+        # Valid modes: python, cython.
+        # Python mode: everything as you expect.
+        # Cython mode: try to transform as many Type Annotations as possible
+        #              from Python PEP484 / PEP526 style into Cython-style declarations.
+        # Example: `def func(a: int, b: int) -> float:` ==> `cpdef float func(int a, int b):`
+        self.mode = mode
+
         self.lines = []
         self.current_line = []
         self.current_indentation = starting_indentation
