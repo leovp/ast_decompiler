@@ -6,6 +6,16 @@ def test_simple_function():
 def func(a: int, b: int) -> float:
     pass
 ''', '''
-cpdef func(int a, int b) -> float:
+cpdef float func(int a, int b):
+    pass
+''', mode='cython', do_check=False)
+
+
+def test_no_return_type():
+    assert_decompiles('''
+def func(a: int, b: int):
+    pass
+''', '''
+cpdef object func(int a, int b):
     pass
 ''', mode='cython', do_check=False)
