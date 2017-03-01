@@ -976,11 +976,17 @@ class Decompiler(ast.NodeVisitor):
             )
 
     def visit_arg(self, node):
-        self.write(node.arg)
-        if node.annotation:
+        if not node.annotation:
+            return self.write(node.arg)
+
+        if self.mode == 'python':
+            self.write(node.arg)
             self.write(': ')
-            # TODO precedence
             self.visit(node.annotation)
+        else:
+            self.visit(node.annotation)
+            self.write(' ')
+            self.write(node.arg)
 
     def visit_keyword(self, node):
         if node.arg is None:
